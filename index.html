@@ -41,27 +41,26 @@
     <button id="startBtn">Start AR</button>
     <div id="errorMsg"></div>
 
-    <a-scene
-      id="arScene"
-      renderer="colorManagement: true; physicallyCorrectLights: true;"
-      webxr="optionalFeatures: hit-test, local-floor;"
-      xr-mode-ui="enabled: false;"   <!-- we control AR manually -->
-      embedded
-      ar-hit-test
-    >
-      <a-assets>
-        <a-asset-item id="my-model" src="assets/asset.glb"></a-asset-item>
-      </a-assets>
+ <a-scene
+  renderer="colorManagement: true; physicallyCorrectLights: true;"
+  webxr="optionalFeatures: hit-test, local-floor;"
+  xr-mode-ui="enabled: false;"
+  embedded
+  ar-hit-test="target:#model; type: transient; allowedPlanes: horizontal"
+>
+  <a-assets>
+    <a-asset-item id="my-model" src="assets/asset.glb"></a-asset-item>
+  </a-assets>
 
-      <a-entity
-        id="model"
-        gltf-model="#my-model"
-        scale="0.2 0.2 0.2"
-        visible="false"
-      ></a-entity>
+  <a-entity
+    id="model"
+    gltf-model="#my-model"
+    scale="0.2 0.2 0.2"
+    visible="false"
+  ></a-entity>
 
-      <a-camera></a-camera>
-    </a-scene>
+  <a-camera></a-camera>
+</a-scene>
 
     <script>
       const startBtn = document.getElementById("startBtn");
