@@ -8,13 +8,17 @@
       body {
         margin: 0;
         overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-family: sans-serif;
         background: #111;
         color: white;
-        font-family: sans-serif;
-        height: 100vh;
+      }
+      #ui {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10;
       }
       #startBtn {
         padding: 12px 24px;
@@ -38,64 +42,73 @@
   </head>
 
   <body>
-    <button id="startBtn">Start AR</button>
-    <div id="errorMsg"></div>
+    <!-- UI Overlay -->
+    <div id="ui">
+      <button id="startBtn">Start AR</button>
+      <div id="errorMsg"></div>
+    </div>
 
- <a-scene
-  renderer="colorManagement: true; physicallyCorrectLights: true;"
-  webxr="optionalFeatures: hit-test, local-floor;"
-  xr-mode-ui="enabled: false;"
-  embedded
-  ar-hit-test="target:#model; type: transient; allowedPlanes: horizontal"
->
-  <a-assets>
-    <a-asset-item id="my-model" src="assets/asset.glb"></a-asset-item>
-  </a-assets>
+    <!-- AR Scene -->
+    <a-scene
+      id="arScene"
+      renderer="colorManagement: true; physicallyCorrectLights: true;"
+      webxr="optionalFeatures: hit-test, local-floor;"
+      xr-mode-ui="enabled: false;"   <!-- we control AR manually -->
+      embedded
+      ar-hit-test
+    >
+      <a-assets>
+        <!-- Your 3D model -->
+        <a-asset-item id="my-model" src="assets/asset.glb"></a-asset-item>
+      </a-assets>
 
-  <a-entity
-    id="model"
-    gltf-model="#my-model"
-    scale="0.2 0.2 0.2"
-    visible="false"
-  ></a-entity>
+      <a-entity
+        id="model"
+        gltf-model="#my-model"
+        scale="0.2 0.2 0.2"
+        visible="false"
+      ></a-entity>
 
-  <a-camera></a-camera>
-</a-scene>
+      <a-camera></a-camera>
+    </a-scene>
 
     <script>
-      const startBtn = document.getElementById("startBtn");
-      const scene = document.getElementById("arScene");
-      const errorMsg = document.getElementById("errorMsg");
+      document.addEventListener("DOMContentLoaded", () => {
+        const startBtn = document.getElementById("startBtn");
+        const scene = document.getElementById("arScene");
+        const errorMsg = document.getElementById("errorMsg");
+        const ui = document.getElementById("ui");
 
-      startBtn.addEventListener("click", async () => {
-        try {
-          // check if XR is available
-          if (!navigator.xr) {
-            throw new Error("WebXR not supported on this device/browser.");
+        startBtn.addEventListener("click", async () => {
+          try {
+            // check if XR is available
+            if (!navigator.xr) {
+              throw new Error("WebXR not supported on this device/browser.");
+            }
+
+            const isSupported = await navigator.xr.isSessionSupported("immersive-ar");
+            if (!isSupported) {
+              throw new Error("AR mode is not supported on this device.");
+            }
+
+            // hide UI, show scene
+            ui.style.display = "none";
+            scene.style.display = "block";
+
+            // enter AR session
+            scene.enterVR();
+          } catch (err) {
+            console.error(err);
+            errorMsg.innerText = err.message;
+            errorMsg.style.display = "block";
           }
+        });
 
-          const isSupported = await navigator.xr.isSessionSupported("immersive-ar");
-          if (!isSupported) {
-            throw new Error("AR mode is not supported on this device.");
-          }
-
-          // hide start button, show scene
-          startBtn.style.display = "none";
-          scene.style.display = "block";
-
-          // enter AR session
-          scene.enterVR();
-        } catch (err) {
-          console.error(err);
-          errorMsg.innerText = err.message;
-          errorMsg.style.display = "block";
-        }
-      });
-
-      // tap to place model
-      scene.addEventListener("click", () => {
-        const model = document.getElementById("model");
-        model.setAttribute("visible", "true");
+        // tap to place model
+        scene.addEventListener("click", () => {
+          const model = document.getElementById("model");
+          model.setAttribute("visible", "true");
+        });
       });
     </script>
   </body>
