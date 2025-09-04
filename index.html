@@ -17,12 +17,21 @@
       </a-assets>
 
       <!-- Model appears where surface is detected -->
-      <a-entity
+<!--       <a-entity
         id="model"
         gltf-model="#my-model"
         scale="0.2 0.2 0.2"
         visible="false"
-      ></a-entity>
+      ></a-entity> -->
+
+        <a-entity
+                    id="bowser-model"
+                    scale="18.897408716663758 18.897408716663758 18.897408716663758"
+                    animation-mixer="loop: repeat"
+                    gltf-model="#animated-asset"
+                    class="clickable"
+                    gesture-handler
+                ></a-entity>
 
       <a-camera></a-camera>
     </a-scene>
